@@ -41,35 +41,29 @@ class BTree:
 
     def split_child(self, parent, i, full_child):
         """
-        Divide un nodo figlio pieno in due nodi e sposta la chiave mediana nel nodo padre.
+                Divide un nodo figlio pieno in due nodi e sposta la chiave mediana nel nodo padre.
 
-        :param parent: Nodo padre che contiene il full_child.
-        :param i: Indice di full_child nel nodo parent.
-        :param full_child: Nodo pieno da dividere.
+                :param parent: Nodo padre che contiene il full_child.
+                :param i: Indice di full_child nel nodo parent.
+                :param full_child: Nodo pieno da dividere.
         """
+
         t = self.t
-        # Crea un nuovo nodo che conterrà t-1 chiavi di full_child
+        # Controllo: verifica che il nodo sia pieno
+        if len(full_child.keys) != 2 * t - 1:
+            raise ValueError(f"split_child chiamato su un nodo non pieno! Chiavi: {full_child.keys}")
+
+        # Crea un nuovo nodo per le chiavi a destra della mediana
         new_child = BTreeNode(t, full_child.is_leaf)
-
-        self.nodes_written += 1  # Scriviamo un nuovo nodo (new_child)
-
-        # Copia le ultime t-1 chiavi di full_child in new_child
         new_child.keys = full_child.keys[t:]
-
-        # Se il nodo non è una foglia, copia anche i figli
         if not full_child.is_leaf:
             new_child.children = full_child.children[t:]
-
-        # Riduci il numero di chiavi di full_child a t-1
-        full_child.keys = full_child.keys[:t - 1]
+        full_child.keys = full_child.keys[:t]
         full_child.children = full_child.children[:t]
-
-        # Inserisci il nuovo figlio nel nodo padre
+        # Sposta la chiave mediana al genitore
         parent.children.insert(i + 1, new_child)
-        # Sposta la chiave mediana di full_child nel nodo parent
         parent.keys.insert(i, full_child.keys[t - 1])
-
-        self.nodes_written += 1  # Scriviamo nel nodo genitore
+        self.nodes_written += 1
 
     def insert_non_full(self, node, key):
         """
@@ -78,9 +72,9 @@ class BTree:
         :param node: Nodo in cui inserire la chiave.
         :param key: Chiave da inserire.
         """
+
         i = len(node.keys) - 1
         self.nodes_read += 1  # Leggiamo il nodo corrente
-
         # Se il nodo è una foglia, inserisci la chiave nel punto corretto
         if node.is_leaf:
             node.keys.append(None)  # Aggiungi uno spazio per la nuova chiave
