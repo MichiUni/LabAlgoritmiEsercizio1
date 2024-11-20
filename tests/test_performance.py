@@ -8,7 +8,7 @@ class TestPerformance(unittest.TestCase):
 
     def test_performance(self):
         # Dataset di test
-        keys = list(range(1, 1001))  # Inseriamo 1000 chiavi
+        keys = list(range(1, 5001))  # Inseriamo 1000 chiavi
         b_tree = BTree(t=5)
         bst = BinarySearchTree()
 
